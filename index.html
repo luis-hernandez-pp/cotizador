@@ -7,7 +7,37 @@
             integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
             crossorigin="anonymous"></script>
         <script>
-            
+function getParamsFormatted() {
+    const params = new URLSearchParams(window.location.search);
+
+    // Helper: format currency
+    const money = num => 
+        Number(num.replace("_", "."))
+        .toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+    // Helper: format phone (Mexico)
+    const formatPhone = tel =>
+        tel.replace(/(\d{2})(\d{4})(\d{4})/, "$1-$2-$3");
+
+    // Helper: fix email
+    const fixEmail = email =>
+        email.replace("_", ".").replace("_", "."); // in case there are 2 underscores
+
+    return {
+        mail: fixEmail(params.get("mail")),
+        telefono: formatPhone(params.get("telefono")),
+        orden: "#" + params.get("orden"),
+        subtotal: "$" + money(params.get("subtotal")) + " MXN",
+        tax: "$" + money(params.get("tax")) + " MXN",
+        envio: "$" + money(params.get("envio")) + " MXN",
+        descuento: "$" + money(params.get("descuento")) + " MXN",
+        total: "$" + money(params.get("total")) + " MXN"
+    };
+}
+
+console.log(getParamsFormatted());
+
+            });
         </script>
     </body>
 </head>

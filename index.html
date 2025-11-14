@@ -336,7 +336,7 @@ $('.info-envio').text(getParamsFormatted().envio);
 $('.info-descuento').text("-"+getParamsFormatted().descuento);
 $('.info-total').text(getParamsFormatted().total);
 
-$('.btn-pagar').attr('href',getParamsFormatted().url);
+$('.btn-pagar').attr('href',getParamsFormatted().url.replace('_','.'));
 
 var arr_items=getParamsFormatted().items;
 for (var i = arr_items.length - 1; i >= 0; i--) {

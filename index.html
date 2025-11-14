@@ -46,11 +46,8 @@
         }
         .section-1 div:nth-child(2){
             width: 36%;
-            background-color: #F1F1F1;
             float: left;
-            padding: 16px 8px;
             text-align: right;
-            margin-top: 54px;
         }
         .footer{
             line-height: 6px;
@@ -95,7 +92,6 @@
             width: 100%;
             font-family: sans-serif;
             margin-top: 28px;
-            margin-bottom: 28px;
             border-collapse: collapse;
         }
         .table-orders tr:nth-last-child(-n + 5) {
@@ -105,17 +101,35 @@
             padding: 28px 0 !important;
         }
         .table-orders tr:nth-last-child(-n + 5) td{
-            padding: 4px 0 !important;
+            padding: 4px 12px !important;
+            white-space: nowrap;
+            text-align: right;
         }
         .section-2 table tr,.section-2 table thead{
             border-bottom:2px solid #BEBEBE;
+        }
+        .btn-pagar{
+            margin-top: 16px;
+            float: right;
+            text-decoration: none;
+            font-family: sans-serif;
+            background-color: #00B0F0;
+            color: white;
+            font-weight: 600;
+            padding: 9px 14px;
+            border-radius: 32px;
+            font-size: 14px;
+            letter-spacing: 1px;
+            margin-bottom: 28px;
+            margin-right: 22px;
+            margin-bottom: 28px;
         }
     </style>
 </head>
     <body>
         <div id="pdf">
         <div class="header">
-            <h1>Cotización</h1>
+            <h1>Cotización <span class="info-orden"></span></h1>
             <img src="https://cdn.shopify.com/s/files/1/0015/6090/3792/files/logo_vecto-01_6891bf1e-1024-49a5-9db4-06a0d01119d6.png?v=1727381615">
         </div>
 
@@ -130,7 +144,6 @@
                 <p class="info-cliente">Cliente</p>
             </div>
             <div>
-                <p>Cotización: <span class="info-orden"></span></p>
                 <p>Fecha: <span class="info-fecha"></span></p>
             </div>
         </div>
@@ -188,6 +201,7 @@
                     </tr>
                 </tbody>
             </table>
+            <a href="https://youtube.com" class="btn-pagar">PAGAR EN LÍNEA</a>
         </div>
 
         <div class="section-3">
@@ -222,6 +236,28 @@ $(document).ready(function(){
         return JSON.parse(decoded);
     }
 
+function exportPDFasBase64() {
+    const element = document.getElementById("pdf");
+
+    html2pdf()
+        .from(element)
+        .outputPdf('datauristring')   // returns base64
+        .then(base64 => {
+            console.log(base64); // "data:application/pdf;base64,JVBERi0xLj..."
+
+            // If you want ONLY the base64 part:
+            const pureBase64 = base64.split(',')[1];
+
+            // Send it to your endpoint
+            fetch("https://your-endpoint.com/upload", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    pdf_base64: pureBase64
+                })
+            });
+        });
+}
 function exportPDF() {
     const element = document.getElementById("pdf");
     
@@ -268,6 +304,7 @@ function getParamsFormatted() {
         envio: "$" + money(params.get("envio")) + " MXN",
         descuento: "$" + money(params.get("descuento")) + " MXN",
         total: "$" + money(params.get("total")) + " MXN",
+        url:decodeURIComponent(params.get("checkout")),
         items: decodeLineItemsFromUrl(params.get("items"))
     };
 }
@@ -296,8 +333,10 @@ $('.info-fecha').text(fechaActualFormateada());
 $('.info-subtotal').text(getParamsFormatted().subtotal);
 $('.info-impuestos').text(getParamsFormatted().tax);
 $('.info-envio').text(getParamsFormatted().envio);
-$('.info-descuento').text(getParamsFormatted().descuento);
+$('.info-descuento').text("-"+getParamsFormatted().descuento);
 $('.info-total').text(getParamsFormatted().total);
+
+$('.btn-pagar').attr('href',getParamsFormatted().url);
 
 var arr_items=getParamsFormatted().items;
 for (var i = arr_items.length - 1; i >= 0; i--) {
@@ -307,7 +346,8 @@ for (var i = arr_items.length - 1; i >= 0; i--) {
 console.log(getParamsFormatted());
 
 setTimeout(() => {
-        exportPDF();
+    exportPDF();
+    exportPDFasBase64();
   }, 800);
 
             });

@@ -130,7 +130,7 @@
         <div id="pdf">
         <div class="header">
             <h1>Cotización <span class="info-orden"></span></h1>
-            <img src="https://cdn.shopify.com/s/files/1/0015/6090/3792/files/logo_vecto-01_6891bf1e-1024-49a5-9db4-06a0d01119d6.png?v=1727381615">
+            <img src="logo.webp">
         </div>
 
         <div class="section-1">
@@ -258,12 +258,26 @@ function exportPDFasBase64() {
             });
         });
 }
+function fechapdf() {
+    const mesesAbrev = [
+        "ene", "feb", "mar", "abr", "may", "jun",
+        "jul", "ago", "sep", "oct", "nov", "dic"
+    ];
+
+    const hoy = new Date();
+    const dia = String(hoy.getDate()).padStart(2, "0");
+    const mes = mesesAbrev[hoy.getMonth()];
+    const anio = hoy.getFullYear();
+
+    return `${dia}-${mes}-${anio}`;
+}
+
 function exportPDF() {
     const element = document.getElementById("pdf");
     
     const opt = {
         margin:       0,
-        filename:     'cotizacion.pdf',
+        filename:     'Cotizacion '+$('.info-cliente').text()+' '+fechapdf()+'.pdf',
         image:        { type: 'jpeg', quality: 0.98 },
         html2canvas:  { scale: 2 },       // High quality
         jsPDF:        { unit: 'pt', format: 'letter', orientation: 'portrait' }
